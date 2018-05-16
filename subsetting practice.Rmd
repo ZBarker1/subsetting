@@ -44,7 +44,7 @@ x[-c(3, 1)]
 
 - you can't mix positive and negative integers in a single subset
 ``` {r}
-x[c(-1, 2)]
+# x[c(-1, 2)]
 ```
 
 - logical vectors select elements where the corresponding logical value is TRUE
@@ -179,7 +179,7 @@ x[upper.tri(x)]
 
 7. Why does mtcars[1:20] return an error? How does it differ from the similar mtcars[1:20, ]?
 ``` {r}
-mtcars[1:20] #doesn't work because we didn't specify rows or cols
+# mtcars[1:20] doesn't work because we didn't specify rows or cols
 mtcars[1:20, ] #returns rows 1 to 20
 ```
 
@@ -200,5 +200,3 @@ is.na(df)
 df[is.na(df)] <- 0 ; df
 # subsets df looking for places where the value is NA and then turns that to 0
 ```
-
-
