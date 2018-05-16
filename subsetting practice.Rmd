@@ -15,3 +15,190 @@ editor_options:
 # 1.0 Subsetting
 - 3 subsetting operators
 - 6 types of subsetting
+
+# 2.0 Selecting multiple elements
+- use [] operator
+
+## 2.1 Atomic vectors
+- positive integers return elements at specified positions
+``` {r}
+x <- c(2.1, 4.2, 3.3, 5.4)
+x[c(3,1)]
+x[order(x)]
+```
+
+- duplicated indices yield duplicated values
+``` {r}
+x[c(1, 1)]
+```
+
+- real numbers are truncated to integers (round down)
+``` {r}
+x[c(2.1, 2.9)]
+```
+
+- negative integers omit elements at the specified positions
+``` {r}
+x[-c(3, 1)]
+```
+
+- you can't mix positive and negative integers in a single subset
+``` {r}
+x[c(-1, 2)]
+```
+
+- logical vectors select elements where the corresponding logical value is TRUE
+``` {r}
+x[c(T, T, F, F)]
+x[x>3]
+```
+
+- if the logical vector is shorter than the vector being subsetted, it will be recycled to be the same length
+```{r}
+x[c(T, F)]
+#same as
+x[c(T, F, T, F)]
+```
+
+- a missing value in the index yields a missing value in the output
+``` {r}
+x[c(T, T, NA, F)]
+```
+
+- nothing returns the original vector/matrix/df/array
+``` {r}
+x[]
+```
+
+- if a vector is named you can also use character vectors to return elements with matching names (must be exact match)
+``` {r}
+y <- setNames(x, letters[1:4])
+y
+
+y[c("d","c","a")]
+
+#like integer indices you can repeat them
+y[c("a","a","a")]
+```
+
+## 2.2 Lists
+- using [[]] and $ lets you pull out components of a list
+- you can subset higher-dimensional structures with multiple vectors, a single vector, or a matrix
+``` {r}
+a <- matrix(1:9, nrow = 3)
+colnames(a) <- c("A", "B", "C")
+a
+a[c(TRUE, FALSE, TRUE), c("B", "A")]
+a[0, -2]
+```
+
+## 2.3 Data frames
+- dfs possess characteristics of both lists and matrices, if you subset with a single vector they behave like lists, if you subset with 2 vectors they behave like matrices
+``` {r}
+df <- data.frame(x=1:3, y=3:1, z=letters[1:3])
+df
+```
+
+``` {r}
+# to select rows
+df[df$x == 2, ]
+df[c(1, 3),]
+
+# to select columns
+# 1. like a list
+df[c("x", "z")]
+# 2. like a matrix
+df[, c("x", "z")]
+```
+
+## 2.4 Preserving dimensionality
+- subsetting 2d data structures with a single number/char/logical vector will simplify the returned output 
+- to preserve original dimensionality, use drop=F
+``` {r}
+# for matrices and arrays, any dimensions with len=1 will be dropped
+a <- matrix(1:4, nrow=2)
+
+str(a[1, ]) #1D
+str(a[1, , drop=F]) #2D
+
+# data frames with a single column will return just that column
+df <- data.frame(a=1:2, b=1:2)
+
+str(df[, "a"])
+str(df[, "a", drop=F])
+```
+
+- ALWAYS ADD drop=F JUST IN CASE!!
+
+## 2.5 Exercises
+
+1)
+```{r}
+# mtcars[mtcars$cyl=4, ] will error need to use equality operator ==
+
+mtcars[mtcars$cyl==4, ]
+```
+
+2)
+``` {r}
+# mtcars[-1:4, ] will error because you can't index over a negative and positive integer
+
+mtcars[2:4, ] # this will drop the first row, and then go to 4
+mtcars[c(ncol(mtcars), 1:4), ] # this will get the last row and the first 4
+```
+
+3)
+``` {r}
+# mtcars[mtcars$cyl <= 5] will error because we haven't specified rows or coluns
+
+mtcars[mtcars$cyl <=5, ]
+```
+
+4)
+``` {r}
+# mtcars[mtcars$cyl == 4 | 6, ] 
+
+mtcars[mtcars$cyl == 4 | mtcars$cyl == 6, ]
+```
+
+5) 
+why does x <- 1:5; x[NA] yield five missing values? (Hint: why is it different from x[NA_real_]?)
+
+6)
+What does upper.tri() return? How does subsetting a matrix with it work? Do we need any additional subsetting rules to describe its behaviour?
+``` {r}
+x <- outer(1:5, 1:5, FUN = "*") ; x
+# this creates a 5 by 5 matrix where each value is its row*col
+
+upper.tri(x)
+# creates a matrix of T or F where T is the upper triangle of values
+
+x[upper.tri(x)]
+# this subsets x with only the values that were true, so values in the upper triangle
+```
+
+7. Why does mtcars[1:20] return an error? How does it differ from the similar mtcars[1:20, ]?
+``` {r}
+mtcars[1:20] #doesn't work because we didn't specify rows or cols
+mtcars[1:20, ] #returns rows 1 to 20
+```
+
+8. Implement your own function that extracts the diagonal entries from a matrix (it should behave like diag(x) where x is a matrix).
+``` {r}
+x <- matrix(LETTERS[1:25], ncol=5) ; x
+diag(x)
+```
+
+9. What does df[is.na(df)] <- 0 do? How does it work?
+``` {r}
+df <- data.frame("memes" = letters[1:9], "dreams" = 7:15, "123" = c(1, 69, NA, 23, 61, 2, 36, NA, 3045069)) ; df
+# creates df with some NA
+
+is.na(df)
+# creates a matrix of logicals where T is NA
+
+df[is.na(df)] <- 0 ; df
+# subsets df looking for places where the value is NA and then turns that to 0
+```
+
+
