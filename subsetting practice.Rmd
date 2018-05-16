@@ -1,0 +1,17 @@
+---
+title: "Subsetting Practice"
+author: "Ziqi Liu"
+date: "May 16, 2018"
+output: 
+  html_document:
+    keep_md: true
+    toc: true
+    toc_float: true
+    toc_depth: 2
+editor_options:
+  chunk_output_type: console
+---
+
+# 1.0 Subsetting
+- 3 subsetting operators
+- 6 types of subsetting
