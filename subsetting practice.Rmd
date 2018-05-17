@@ -21,34 +21,34 @@ editor_options:
 
 ## 2.1 Atomic vectors
 - positive integers return elements at specified positions
-``` {r}
+```{r}
 x <- c(2.1, 4.2, 3.3, 5.4)
 x[c(3,1)]
 x[order(x)]
 ```
 
 - duplicated indices yield duplicated values
-``` {r}
+```{r}
 x[c(1, 1)]
 ```
 
 - real numbers are truncated to integers (round down)
-``` {r}
+```{r}
 x[c(2.1, 2.9)]
 ```
 
 - negative integers omit elements at the specified positions
-``` {r}
+```{r}
 x[-c(3, 1)]
 ```
 
 - you can't mix positive and negative integers in a single subset
-``` {r}
+```{r}
 # x[c(-1, 2)]
 ```
 
 - logical vectors select elements where the corresponding logical value is TRUE
-``` {r}
+```{r}
 x[c(T, T, F, F)]
 x[x>3]
 ```
@@ -61,17 +61,17 @@ x[c(T, F, T, F)]
 ```
 
 - a missing value in the index yields a missing value in the output
-``` {r}
+```{r}
 x[c(T, T, NA, F)]
 ```
 
 - nothing returns the original vector/matrix/df/array
-``` {r}
+```{r}
 x[]
 ```
 
 - if a vector is named you can also use character vectors to return elements with matching names (must be exact match)
-``` {r}
+```{r}
 y <- setNames(x, letters[1:4])
 y
 
@@ -84,7 +84,7 @@ y[c("a","a","a")]
 ## 2.2 Lists
 - using [[]] and $ lets you pull out components of a list
 - you can subset higher-dimensional structures with multiple vectors, a single vector, or a matrix
-``` {r}
+```{r}
 a <- matrix(1:9, nrow = 3)
 colnames(a) <- c("A", "B", "C")
 a
@@ -94,12 +94,12 @@ a[0, -2]
 
 ## 2.3 Data frames
 - dfs possess characteristics of both lists and matrices, if you subset with a single vector they behave like lists, if you subset with 2 vectors they behave like matrices
-``` {r}
+```{r}
 df <- data.frame(x=1:3, y=3:1, z=letters[1:3])
 df
 ```
 
-``` {r}
+```{r}
 # to select rows
 df[df$x == 2, ]
 df[c(1, 3),]
@@ -114,7 +114,7 @@ df[, c("x", "z")]
 ## 2.4 Preserving dimensionality
 - subsetting 2d data structures with a single number/char/logical vector will simplify the returned output 
 - to preserve original dimensionality, use drop=F
-``` {r}
+```{r}
 # for matrices and arrays, any dimensions with len=1 will be dropped
 a <- matrix(1:4, nrow=2)
 
@@ -140,7 +140,7 @@ mtcars[mtcars$cyl==4, ]
 ```
 
 2)
-``` {r}
+```{r}
 # mtcars[-1:4, ] will error because you can't index over a negative and positive integer
 
 mtcars[2:4, ] # this will drop the first row, and then go to 4
@@ -148,14 +148,14 @@ mtcars[c(ncol(mtcars), 1:4), ] # this will get the last row and the first 4
 ```
 
 3)
-``` {r}
+```{r}
 # mtcars[mtcars$cyl <= 5] will error because we haven't specified rows or coluns
 
 mtcars[mtcars$cyl <=5, ]
 ```
 
 4)
-``` {r}
+```{r}
 # mtcars[mtcars$cyl == 4 | 6, ] 
 
 mtcars[mtcars$cyl == 4 | mtcars$cyl == 6, ]
@@ -166,7 +166,7 @@ why does x <- 1:5; x[NA] yield five missing values? (Hint: why is it different f
 
 6)
 What does upper.tri() return? How does subsetting a matrix with it work? Do we need any additional subsetting rules to describe its behaviour?
-``` {r}
+```{r}
 x <- outer(1:5, 1:5, FUN = "*") ; x
 # this creates a 5 by 5 matrix where each value is its row*col
 
@@ -178,19 +178,19 @@ x[upper.tri(x)]
 ```
 
 7. Why does mtcars[1:20] return an error? How does it differ from the similar mtcars[1:20, ]?
-``` {r}
+```{r}
 # mtcars[1:20] doesn't work because we didn't specify rows or cols
 mtcars[1:20, ] #returns rows 1 to 20
 ```
 
 8. Implement your own function that extracts the diagonal entries from a matrix (it should behave like diag(x) where x is a matrix).
-``` {r}
+```{r}
 x <- matrix(LETTERS[1:25], ncol=5) ; x
 diag(x)
 ```
 
 9. What does df[is.na(df)] <- 0 do? How does it work?
-``` {r}
+```{r}
 df <- data.frame("memes" = letters[1:9], "dreams" = 7:15, "123" = c(1, 69, NA, 23, 61, 2, 36, NA, 3045069)) ; df
 # creates df with some NA
 
@@ -200,3 +200,57 @@ is.na(df)
 df[is.na(df)] <- 0 ; df
 # subsets df looking for places where the value is NA and then turns that to 0
 ```
+
+# 3.0 Selecting a single element
+- use $ or [[]]
+- [[]] is like a nested list
+```{r}
+mtcars[1] #returns the first column with all the rownames
+mtcars[[1]] #returns all the values of the first column
+```
+
+# 3.1 $
+- x$y is ~= x[["y"]]
+- where x is the tibble/df/matrix name and y is the name of a variable(column) in it
+
+# 3.2 Exercises
+1)
+Come up with as many way as possible to extract the third value from the cyl variable in the mtcars dataset.
+
+```{r}
+mtcars[[2]][3]
+mtcars$cyl[3]
+```
+
+# 4.0 Subsetting and assignment
+- all subsetting operators can be combined with assignment operators to modify selected values of input vector
+```{r}
+x <- 1:5 ; x[c(1, 2)] <- 2:3 ; x
+
+x[-1] <- 4:1 ; x
+# length(LHS) needs to = length(RHS) for assignment to work
+
+x[c(1, 1)] <- 2:3 ; x
+# duplicated indices go unchecked and may be problematic
+
+# you can't combine integer indices with NA but you can combine logical indices with NA
+```
+
+- subsetting with nothing and then assignment preserves original object class and structure
+```{r}
+mtcars[] <- lapply(mtcars, as.integer) #mtcars stays as df
+mtcars <- lapply(mtcars, as.integer) #mtcars becomes list
+```
+
+# 5.0 Applications
+
+## 5.1 Lookup tables
+```{r}
+
+
+
+
+
+
+
+
